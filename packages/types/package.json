@@ -37,5 +37,7 @@
   "devDependencies": {
     "tsdx": "^0.14.1"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@web3-react-multichain/abstract-connector": "^6.0.7"
+  }
 }

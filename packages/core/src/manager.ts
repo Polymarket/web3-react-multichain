@@ -1,6 +1,6 @@
 import { useReducer, useEffect, useCallback, useRef } from 'react'
-import { ConnectorUpdate, ConnectorEvent } from '@web3-react/types'
-import { AbstractConnector } from '@web3-react/abstract-connector'
+import { ConnectorUpdate, ConnectorEvent } from '@web3-react-multichain/types'
+import { AbstractConnector } from '@web3-react-multichain/abstract-connector'
 import warning from 'tiny-warning'
 
 import { Web3ReactManagerReturn } from './types'
@@ -157,7 +157,12 @@ export function useWeb3ReactManager(): Web3ReactManagerReturn {
     dispatch({ type: ActionType.ERROR, payload: { error } })
   }, [])
 
-  const deactivate = useCallback((): void => {
+  const deactivate = useCallback(async (): Promise<void> => {
+    if (!connector) {
+      throw Error("web3-react must be active to deactivate");
+    }
+
+    await connector.deactivate();
     dispatch({ type: ActionType.DEACTIVATE_CONNECTOR })
   }, [])
 

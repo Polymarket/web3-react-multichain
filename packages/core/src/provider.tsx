@@ -22,10 +22,10 @@ export function createWeb3ReactRoot(key: string): (args: Web3ReactProviderArgume
     setError: () => {
       invariant(false, 'No <Web3ReactProvider ... /> found.')
     },
-    deactivate: () => {
+    deactivate: async () => {
       invariant(false, 'No <Web3ReactProvider ... /> found.')
     },
-    getProvider: () => {
+    getProvider: async () => {
       invariant(false, 'No <Web3ReactProvider ... /> found.')
     },
     active: false

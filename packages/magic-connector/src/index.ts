@@ -1,5 +1,5 @@
-import { ConnectorUpdate, Network } from '@web3-react/types'
-import { AbstractConnector } from '@web3-react/abstract-connector'
+import { ConnectorUpdate, Network } from '@web3-react-multichain/types'
+import { AbstractConnector } from '@web3-react-multichain/abstract-connector'
 import invariant from 'tiny-invariant'
 import { Web3Provider } from '@ethersproject/providers'
 
@@ -19,6 +19,7 @@ interface MagicConnectorArguments {
   apiKey: string
   networks: Network[]
   email: string
+  endpoint: string
 }
 
 export class UserRejectedRequestError extends Error {
@@ -66,12 +67,13 @@ export class MagicConnector extends AbstractConnector {
       invariant(Object.keys(chainIdToNetwork).includes(chainId.toString()), `Unsupported chainId ${chainId}`)
     )
     invariant(email && email.includes('@'), `Invalid email: ${email}`)
-    super({ supportedChainIds: chainIds })
+    super({ supportedChainIds: networks.map(({ chainId }) => chainId) })
 
-    this.networks = neetworks
-    this.endpoint = endpont
+    this.networks = networks
+    this.endpoint = endpoint
     this.apiKey = apiKey
     this.email = email
+    this.magicInstances = {}
   }
 
   public getInitialInstance(): any {

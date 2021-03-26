@@ -12,7 +12,6 @@ export abstract class AbstractConnector extends EventEmitter {
 
   public abstract async activate(): Promise<ConnectorUpdate>
   public abstract async getProvider(chainId: number): Promise<Web3Provider>
-  public abstract async getChainId(): Promise<number | string>
   public abstract async getAccount(): Promise<null | string>
   public abstract async deactivate(): Promise<void>
 
