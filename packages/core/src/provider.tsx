@@ -1,14 +1,14 @@
-import React, { createContext, useContext, useMemo } from 'react'
+import React, { createContext, useContext, useCallback } from 'react'
 import invariant from 'tiny-invariant'
 
 import { Web3ReactContextInterface } from './types'
 import { useWeb3ReactManager } from './manager'
+import { normalizeChainId } from './normalizers'
 
 export const PRIMARY_KEY = 'primary'
 const CONTEXTS: { [key: string]: React.Context<Web3ReactContextInterface> } = {}
 
 interface Web3ReactProviderArguments {
-  getLibrary: (provider?: any, connector?: Required<Web3ReactContextInterface>['connector']) => any
   children: any
 }
 
@@ -25,16 +25,18 @@ export function createWeb3ReactRoot(key: string): (args: Web3ReactProviderArgume
     deactivate: () => {
       invariant(false, 'No <Web3ReactProvider ... /> found.')
     },
+    getProvider: () => {
+      invariant(false, 'No <Web3ReactProvider ... /> found.')
+    },
     active: false
   })
   CONTEXTS[key].displayName = `Web3ReactContext - ${key}`
 
   const Provider = CONTEXTS[key].Provider
 
-  return function Web3ReactProvider({ getLibrary, children }: Web3ReactProviderArguments): JSX.Element {
+  return function Web3ReactProvider({ children }: Web3ReactProviderArguments): JSX.Element {
     const {
       connector,
-      provider,
       chainId,
       account,
 
@@ -46,19 +48,26 @@ export function createWeb3ReactRoot(key: string): (args: Web3ReactProviderArgume
     } = useWeb3ReactManager()
 
     const active = connector !== undefined && chainId !== undefined && account !== undefined && !!!error
-    const library = useMemo(
-      () =>
-        active && chainId !== undefined && Number.isInteger(chainId) && !!connector
-          ? getLibrary(provider, connector)
-          : undefined,
-      [active, getLibrary, provider, connector, chainId]
-    )
+
+    const getProvider = useCallback(async (_chainId: number) => {
+        if (!connector) throw new Error('Cannot call `getProvider` before calling `activate`')
+
+        const chainId = normalizeChainId(_chainId)
+        if (!!connector.supportedChainIds && !connector.supportedChainIds.includes(chainId)) {
+          // throw an error rather than setting `error` because this is the developers fault
+          throw new Error(`Unsupported chain id: ${chainId}. Supported chain ids are: ${connector.supportedChainIds}.`)
+        }
+
+        return await connector.getProvider(chainId);
+    }, [])
 
     const web3ReactContext: Web3ReactContextInterface = {
       connector,
-      library,
+
       chainId,
       account,
+
+      getProvider,
 
       activate,
       setError,

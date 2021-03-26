@@ -4,7 +4,7 @@ import { AbstractConnector } from '@web3-react/abstract-connector'
 import warning from 'tiny-warning'
 
 import { Web3ReactManagerReturn } from './types'
-import { normalizeChainId, normalizeAccount } from './normalizers'
+import { normalizeAccount, normalizeChainId } from './normalizers'
 
 class StaleConnectorError extends Error {
   constructor() {
@@ -23,8 +23,6 @@ export class UnsupportedChainIdError extends Error {
 
 interface Web3ReactManagerState {
   connector?: AbstractConnector
-  provider?: any
-  chainId?: number
   account?: null | string
 
   onError?: (error: Error) => void
@@ -49,24 +47,20 @@ interface Action {
 function reducer(state: Web3ReactManagerState, { type, payload }: Action): Web3ReactManagerState {
   switch (type) {
     case ActionType.ACTIVATE_CONNECTOR: {
-      const { connector, provider, chainId, account, onError } = payload
-      return { connector, provider, chainId, account, onError }
+      const { connector, account, onError } = payload
+      return { connector, account, onError }
     }
     case ActionType.UPDATE: {
-      const { provider, chainId, account } = payload
+      const { account } = payload
       return {
         ...state,
-        ...(provider === undefined ? {} : { provider }),
-        ...(chainId === undefined ? {} : { chainId }),
         ...(account === undefined ? {} : { account })
       }
     }
     case ActionType.UPDATE_FROM_ERROR: {
-      const { provider, chainId, account } = payload
+      const { account } = payload
       return {
         ...state,
-        ...(provider === undefined ? {} : { provider }),
-        ...(chainId === undefined ? {} : { chainId }),
         ...(account === undefined ? {} : { account }),
         error: undefined
       }
@@ -97,24 +91,18 @@ async function augmentConnectorUpdate(
   connector: AbstractConnector,
   update: ConnectorUpdate
 ): Promise<ConnectorUpdate<number>> {
-  const provider = update.provider === undefined ? await connector.getProvider() : update.provider
-  const [_chainId, _account] = (await Promise.all([
-    update.chainId === undefined ? connector.getChainId() : update.chainId,
-    update.account === undefined ? connector.getAccount() : update.account
-  ])) as [Required<ConnectorUpdate>['chainId'], Required<ConnectorUpdate>['account']]
+  const _account = (
+    update.account === undefined ? await connector.getAccount() : update.account
+  ) as Required<ConnectorUpdate>['account']
 
-  const chainId = normalizeChainId(_chainId)
-  if (!!connector.supportedChainIds && !connector.supportedChainIds.includes(chainId)) {
-    throw new UnsupportedChainIdError(chainId, connector.supportedChainIds)
-  }
   const account = _account === null ? _account : normalizeAccount(_account)
 
-  return { provider, chainId, account }
+  return { account }
 }
 
 export function useWeb3ReactManager(): Web3ReactManagerReturn {
   const [state, dispatch] = useReducer(reducer, {})
-  const { connector, provider, chainId, account, onError, error } = state
+  const { connector, account, onError, error } = state
 
   const updateBusterRef = useRef(-1)
   updateBusterRef.current += 1
@@ -124,7 +112,7 @@ export function useWeb3ReactManager(): Web3ReactManagerReturn {
       connector: AbstractConnector,
       onError?: (error: Error) => void,
       throwErrors: boolean = false
-    ): Promise<void> => {
+    ): Promise<string | undefined> => {
       const updateBusterInitial = updateBusterRef.current
 
       let activated = false
@@ -142,6 +130,8 @@ export function useWeb3ReactManager(): Web3ReactManagerReturn {
           throw new StaleConnectorError()
         }
         dispatch({ type: ActionType.ACTIVATE_CONNECTOR, payload: { connector, ...augmentedUpdate, onError } })
+
+        return update.authToken
       } catch (error) {
         if (error instanceof StaleConnectorError) {
           activated && connector.deactivate()
@@ -156,6 +146,8 @@ export function useWeb3ReactManager(): Web3ReactManagerReturn {
           // we don't call activated && connector.deactivate() here because it'll be handled in the useEffect
           dispatch({ type: ActionType.ERROR_FROM_ACTIVATION, payload: { connector, error } })
         }
+
+        return
       }
     },
     []
@@ -185,7 +177,7 @@ export function useWeb3ReactManager(): Web3ReactManagerReturn {
           onError ? onError(error) : dispatch({ type: ActionType.ERROR, payload: { error } })
         } else {
           const account = typeof update.account === 'string' ? normalizeAccount(update.account) : update.account
-          dispatch({ type: ActionType.UPDATE, payload: { provider: update.provider, chainId, account } })
+          dispatch({ type: ActionType.UPDATE, payload: { chainId, account } })
         }
       } else {
         try {
@@ -213,9 +205,12 @@ export function useWeb3ReactManager(): Web3ReactManagerReturn {
     },
     [onError]
   )
-  const handleDeactivate = useCallback((): void => {
+  const handleDeactivate = useCallback(async (): Promise<void> => {
+    if (connector) {
+      await connector.deactivate()
+    }
     dispatch({ type: ActionType.DEACTIVATE_CONNECTOR })
-  }, [])
+  }, [connector])
 
   // ensure that connectors which were set are deactivated
   useEffect((): (() => void) => {
@@ -245,5 +240,5 @@ export function useWeb3ReactManager(): Web3ReactManagerReturn {
     }
   }, [connector, handleUpdate, handleError, handleDeactivate])
 
-  return { connector, provider, chainId, account, activate, setError, deactivate, error }
+  return { connector, account, activate, setError, deactivate, error }
 }

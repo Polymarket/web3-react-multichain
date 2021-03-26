@@ -1,19 +1,23 @@
-import { ConnectorUpdate } from '@web3-react/types'
+import { ConnectorUpdate, Network } from '@web3-react/types'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import invariant from 'tiny-invariant'
+import { Web3Provider } from '@ethersproject/providers'
 
-type NetworkName = 'mainnet' | 'ropsten' | 'rinkeby' | 'kovan'
+type NetworkName = 'mainnet' | 'ropsten' | 'rinkeby' | 'kovan' | 'goerli' | 'matic' | 'mumbai'
 
 const chainIdToNetwork: { [network: number]: NetworkName } = {
   1: 'mainnet',
   3: 'ropsten',
   4: 'rinkeby',
-  42: 'kovan'
+  5: 'goerli',
+  42: 'kovan',
+  137: 'matic',
+  80001: 'mumbai'
 }
 
 interface MagicConnectorArguments {
   apiKey: string
-  chainId: number
+  networks: Network[]
   email: string
 }
 
@@ -51,39 +55,58 @@ export class MagicLinkExpiredError extends Error {
 
 export class MagicConnector extends AbstractConnector {
   private readonly apiKey: string
-  private readonly chainId: number
   private readonly email: string
+  private readonly networks: Network[]
+  private readonly endpoint: string
 
-  public magic: any
+  public magicInstances: Record<number, any>
 
-  constructor({ apiKey, chainId, email }: MagicConnectorArguments) {
-    invariant(Object.keys(chainIdToNetwork).includes(chainId.toString()), `Unsupported chainId ${chainId}`)
+  constructor({ apiKey, email, networks, endpoint }: MagicConnectorArguments) {
+    networks.map(({ chainId }) =>
+      invariant(Object.keys(chainIdToNetwork).includes(chainId.toString()), `Unsupported chainId ${chainId}`)
+    )
     invariant(email && email.includes('@'), `Invalid email: ${email}`)
-    super({ supportedChainIds: [chainId] })
+    super({ supportedChainIds: chainIds })
 
+    this.networks = neetworks
+    this.endpoint = endpont
     this.apiKey = apiKey
-    this.chainId = chainId
     this.email = email
+  }
+
+  public getInitialInstance(): any {
+    const instance = this.magicInstances[this.networks[0].chainId]
+    invariant(!!instance, 'Unable to get magic instance before calling `activate`')
+    return instance
   }
 
   public async activate(): Promise<ConnectorUpdate> {
     const MagicSDK = await import('magic-sdk').then(m => m?.default ?? m)
     const { Magic, RPCError, RPCErrorCode } = MagicSDK
 
-    if (!this.magic) {
-      this.magic = new Magic(this.apiKey, { network: chainIdToNetwork[this.chainId] })
-    }
+    this.networks.forEach(network => {
+      const instance = this.magicInstances[network.chainId]
+      if (!instance) {
+        this.magicInstances[network.chainId] = new Magic(this.apiKey, {
+          network,
+          endpoint: this.endpoint
+        })
+      }
+    })
 
-    const isLoggedIn = await this.magic.user.isLoggedIn()
-    const loggedInEmail = isLoggedIn ? (await this.magic.user.getMetadata()).email : null
+    const magic = this.getInitialInstance()
+
+    const isLoggedIn = await magic.user.isLoggedIn()
+    const loggedInEmail = isLoggedIn ? (await magic.user.getMetadata()).email : null
 
     if (isLoggedIn && loggedInEmail !== this.email) {
-      await this.magic.user.logout()
+      await magic.user.logout()
     }
 
+    let authToken
     if (!isLoggedIn) {
       try {
-        await this.magic.auth.loginWithMagicLink({ email: this.email })
+        authToken = await magic.auth.loginWithMagicLink({ email: this.email, showUI: false })
       } catch (err) {
         if (!(err instanceof RPCError)) {
           throw err
@@ -105,28 +128,28 @@ export class MagicConnector extends AbstractConnector {
       }
     }
 
-    const provider = this.magic.rpcProvider
-    const account = await provider.enable().then((accounts: string[]): string => accounts[0])
+    const account = await magic.rpcProvider.enable().then((accounts: string[]): string => accounts[0])
 
-    return { provider, chainId: this.chainId, account }
+    return { account, authToken }
   }
 
-  public async getProvider(): Promise<any> {
-    return this.magic.rpcProvider
-  }
+  public async getProvider(chainId: number): Promise<Web3Provider> {
+    invariant(Object.keys(chainIdToNetwork).includes(chainId.toString()), `Unsupported chainId ${chainId}`)
 
-  public async getChainId(): Promise<number | string> {
-    return this.chainId
+    const instance = this.magicInstances[chainId]
+    invariant(!!instance, 'Unable to get provider before calling `activate`')
+
+    return new Web3Provider(instance.rpcProvider as any)
   }
 
   public async getAccount(): Promise<null | string> {
-    return this.magic.rpcProvider.send('eth_accounts').then((accounts: string[]): string => accounts[0])
+    return this.getInitialInstance()
+      .send('eth_accounts')
+      .then((accounts: string[]): string => accounts[0])
   }
 
-  public deactivate() {}
-
-  public async close() {
-    await this.magic.user.logout()
+  public async deactivate() {
+    await Promise.all(this.networks.map(network => this.magicInstances[network.chainId]?.user.logout()))
     this.emitDeactivate()
   }
 }

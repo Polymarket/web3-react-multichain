@@ -44,5 +44,8 @@
   "peerDependencies": {
     "react": ">=16.8"
   },
-  "license": "GPL-3.0-or-later"
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "tsdx": "^0.14.1"
+  }
 }

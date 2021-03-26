@@ -32,7 +32,7 @@
   "scripts": {
     "start": "tsdx watch",
     "build": "tsdx build",
-    "lint": "tsdx lint src"
+    "lint": "tsdx lint src --fix"
   },
   "dependencies": {
     "@web3-react/abstract-connector": "^6.0.7",

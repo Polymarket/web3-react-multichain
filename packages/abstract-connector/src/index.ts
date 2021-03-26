@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events'
 import { AbstractConnectorArguments, ConnectorUpdate, ConnectorEvent } from '@web3-react/types'
+import { Web3Provider } from '@ethersproject/providers'
 
 export abstract class AbstractConnector extends EventEmitter {
   public readonly supportedChainIds?: number[]
@@ -10,10 +11,10 @@ export abstract class AbstractConnector extends EventEmitter {
   }
 
   public abstract async activate(): Promise<ConnectorUpdate>
-  public abstract async getProvider(): Promise<any>
+  public abstract async getProvider(chainId: number): Promise<Web3Provider>
   public abstract async getChainId(): Promise<number | string>
   public abstract async getAccount(): Promise<null | string>
-  public abstract deactivate(): void
+  public abstract async deactivate(): Promise<void>
 
   protected emitUpdate(update: ConnectorUpdate): void {
     if (__DEV__) {

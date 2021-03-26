@@ -3,13 +3,19 @@ export interface AbstractConnectorArguments {
 }
 
 export interface ConnectorUpdate<T = number | string> {
-  provider?: any
   chainId?: T
   account?: null | string
+  authToken?: string | undefined
 }
 
 export enum ConnectorEvent {
   Update = 'Web3ReactUpdate',
   Error = 'Web3ReactError',
   Deactivate = 'Web3ReactDeactivate'
+}
+
+export interface Network {
+  rpcUrl: string
+  chainId: number
+  explorerUrl: string
 }
