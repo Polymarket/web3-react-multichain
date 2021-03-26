@@ -1,5 +1,5 @@
 {
-  "name": "@web3-react/types",
+  "name": "@web3-react-multichain/types",
   "publishConfig": {
     "access": "public"
   },
@@ -36,5 +36,6 @@
   "license": "GPL-3.0-or-later",
   "devDependencies": {
     "tsdx": "^0.14.1"
-  }
+  },
+  "dependencies": {}
 }

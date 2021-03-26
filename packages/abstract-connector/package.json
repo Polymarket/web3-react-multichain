@@ -1,5 +1,5 @@
 {
-  "name": "@web3-react/abstract-connector",
+  "name": "@web3-react-multichain/abstract-connector",
   "publishConfig": {
     "access": "public"
   },
@@ -34,7 +34,7 @@
     "lint": "tsdx lint src"
   },
   "dependencies": {
-    "@web3-react/types": "^6.0.7"
+    "@web3-react-multichain/types": "^6.0.7"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {

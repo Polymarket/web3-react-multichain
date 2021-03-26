@@ -1,5 +1,5 @@
 {
-  "name": "@web3-react/injected-connector",
+  "name": "@web3-react-multichain/injected-connector",
   "publishConfig": {
     "access": "public"
   },
@@ -35,6 +35,8 @@
     "lint": "tsdx lint src"
   },
   "dependencies": {
+    "@web3-react-multichain/abstract-connector": "^6.0.7",
+    "@web3-react-multichain/types": "^6.0.7",
     "@web3-react/abstract-connector": "^6.0.7",
     "@web3-react/types": "^6.0.7",
     "tiny-warning": "^1.0.3"

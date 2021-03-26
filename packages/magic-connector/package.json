@@ -1,5 +1,5 @@
 {
-  "name": "@web3-react/magic-connector",
+  "name": "@web3-react-multichain/magic-connector",
   "publishConfig": {
     "access": "public"
   },
@@ -35,8 +35,8 @@
     "lint": "tsdx lint src --fix"
   },
   "dependencies": {
-    "@web3-react/abstract-connector": "^6.0.7",
-    "@web3-react/types": "^6.0.7",
+    "@web3-react-multichain/abstract-connector": "^6.0.7",
+    "@web3-react-multichain/types": "^6.0.7",
     "magic-sdk": "^2.4.7",
     "tiny-invariant": "^1.0.6"
   },
