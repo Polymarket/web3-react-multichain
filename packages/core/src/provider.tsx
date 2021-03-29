@@ -1,93 +1,60 @@
-import React, { createContext, useContext, useCallback } from 'react'
+import React, { createContext, useContext } from 'react'
 import invariant from 'tiny-invariant'
 
 import { Web3ReactContextInterface } from './types'
 import { useWeb3ReactManager } from './manager'
-import { normalizeChainId } from './normalizers'
 
-export const PRIMARY_KEY = 'primary'
-const CONTEXTS: { [key: string]: React.Context<Web3ReactContextInterface> } = {}
-
-interface Web3ReactProviderArguments {
-  children: any
-}
-
-export function createWeb3ReactRoot(key: string): (args: Web3ReactProviderArguments) => JSX.Element {
-  invariant(!CONTEXTS[key], `A root already exists for provided key ${key}`)
-
-  CONTEXTS[key] = createContext<Web3ReactContextInterface>({
+const Web3ReactContext = createContext<Web3ReactContextInterface>({
     activate: async () => {
-      invariant(false, 'No <Web3ReactProvider ... /> found.')
+        invariant(false, "No <Web3ReactProvider ... /> found.");
     },
     setError: () => {
-      invariant(false, 'No <Web3ReactProvider ... /> found.')
+        invariant(false, "No <Web3ReactProvider ... /> found.");
     },
     deactivate: async () => {
-      invariant(false, 'No <Web3ReactProvider ... /> found.')
+        invariant(false, "No <Web3ReactProvider ... /> found.");
     },
     getProvider: async () => {
-      invariant(false, 'No <Web3ReactProvider ... /> found.')
+        invariant(false, "No <Web3ReactProvider ... /> found.");
     },
-    active: false
-  })
-  CONTEXTS[key].displayName = `Web3ReactContext - ${key}`
+    active: false,
+});
 
-  const Provider = CONTEXTS[key].Provider
+const { Provider } = Web3ReactContext;
 
-  return function Web3ReactProvider({ children }: Web3ReactProviderArguments): JSX.Element {
+export const Web3ReactProvider: React.FC = ({ children }) => {
     const {
-      connector,
-      chainId,
-      account,
+        connector,
+        account,
 
-      activate,
-      setError,
-      deactivate,
+        activate,
+        setError,
+        deactivate,
+        getProvider,
 
-      error
-    } = useWeb3ReactManager()
+        error,
+    } = useWeb3ReactManager();
 
-    const active = connector !== undefined && chainId !== undefined && account !== undefined && !!!error
-
-    const getProvider = useCallback(async (_chainId: number) => {
-        if (!connector) throw new Error('Cannot call `getProvider` before calling `activate`')
-
-        const chainId = normalizeChainId(_chainId)
-        if (!!connector.supportedChainIds && !connector.supportedChainIds.includes(chainId)) {
-          // throw an error rather than setting `error` because this is the developers fault
-          throw new Error(`Unsupported chain id: ${chainId}. Supported chain ids are: ${connector.supportedChainIds}.`)
-        }
-
-        return await connector.getProvider(chainId);
-    }, [])
+    const active = connector !== undefined && account !== undefined && !error;
 
     const web3ReactContext: Web3ReactContextInterface = {
-      connector,
+        connector,
 
-      chainId,
-      account,
+        account,
 
-      getProvider,
+        getProvider,
 
-      activate,
-      setError,
-      deactivate,
+        activate,
+        setError,
+        deactivate,
 
-      active,
-      error
-    }
+        active,
+        error,
+    };
 
-    return <Provider value={web3ReactContext}>{children}</Provider>
-  }
-}
+    return <Provider value={web3ReactContext}>{children}</Provider>;
+};
 
-export const Web3ReactProvider = createWeb3ReactRoot(PRIMARY_KEY)
-
-export function getWeb3ReactContext<T = any>(key: string = PRIMARY_KEY): React.Context<Web3ReactContextInterface<T>> {
-  invariant(Object.keys(CONTEXTS).includes(key), `Invalid key ${key}`)
-  return CONTEXTS[key]
-}
-
-export function useWeb3React<T = any>(key?: string): Web3ReactContextInterface<T> {
-  return useContext(getWeb3ReactContext(key))
+export function useWeb3React(): Web3ReactContextInterface {
+    return useContext(Web3ReactContext);
 }
