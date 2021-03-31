@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A simple, maximally extensible, dependency minimized framework for building modern Ethereum dApps",
   "keywords": [
     "react",
@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "@ethersproject/providers": "^5.1.0",
-    "@web3-react-multichain/types": "^0.0.1"
+    "@web3-react-multichain/types": "^0.0.2"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
