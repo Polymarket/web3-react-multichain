@@ -1,4 +1,8 @@
-# `web3-react` 🧰
+# `web3-react-multichain`
+
+_A fork of web3-react designed to be used with apps that touch multiple different chains_
+
+## `web3-react` 🧰
 
 _A simple, maximally extensible, dependency minimized framework for building modern [Ethereum dApps](https://ethereum.org/beginners/)_
 

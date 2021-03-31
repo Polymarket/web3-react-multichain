@@ -2,7 +2,6 @@ import { ConnectorUpdate, Network } from "@web3-react-multichain/types";
 import { AbstractConnector } from "@web3-react-multichain/abstract-connector";
 import invariant from "tiny-invariant";
 import { Web3Provider } from "@ethersproject/providers";
-import { Magic as MagicType } from "@magic-sdk/types";
 
 type NetworkName = "mainnet" | "ropsten" | "rinkeby" | "kovan" | "goerli" | "matic" | "mumbai";
 
@@ -64,7 +63,7 @@ export class MagicConnector extends AbstractConnector {
 
   private readonly endpoint: string;
 
-  public magicInstances: Record<number, MagicType>;
+  public magicInstances: Record<number, any>; // eslint-disable-line
 
   constructor({ apiKey, email, networks, endpoint }: MagicConnectorArguments) {
     networks.map(({ chainId }) =>
@@ -80,7 +79,7 @@ export class MagicConnector extends AbstractConnector {
     this.magicInstances = {};
   }
 
-  public getInitialInstance(): MagicType {
+  public getInitialInstance(): any { // eslint-disable-line
     const instance = this.magicInstances[this.networks[0].chainId];
     invariant(!!instance, "Unable to get magic instance before calling `activate`");
     return instance;
@@ -136,7 +135,7 @@ export class MagicConnector extends AbstractConnector {
 
     const account = await magic.rpcProvider.enable().then((accounts: string[]): string => accounts[0]);
 
-    return { account, authToken };
+    return { account, authToken: authToken || "" };
   }
 
   public async getProvider(chainId: number): Promise<Web3Provider> {
@@ -149,9 +148,9 @@ export class MagicConnector extends AbstractConnector {
   }
 
   public async getAccount(): Promise<null | string> {
-    return this.getInitialInstance()
-      .send("eth_accounts")
-      .then((accounts: string[]): string => accounts[0]);
+    const accounts = await this.getInitialInstance().send("eth_accounts");
+
+    return accounts[0];
   }
 
   public async deactivate() {
