@@ -36,12 +36,14 @@
     "build": "lerna run build",
     "start": "lerna run --parallel start -- --noClean",
     "lint": "lerna run lint --parallel",
-    "test": "lerna run test --parallel"
+    "test": "lerna run test --parallel",
+    "lint:fix": "lerna run lint:fix --parallel"
   },
   "devDependencies": {
     "@types/jest": "^24.0.21",
     "@types/react": "^16.9.11",
     "@types/react-dom": "^16.9.4",
+    "eslint-config-airbnb-base-typescript-prettier": "2.1.2",
     "lerna": "^3.19.0",
     "react": ">=16.8",
     "react-dom": ">=16.8",
@@ -50,8 +52,8 @@
   },
   "license": "GPL-3.0-or-later",
   "prettier": {
-    "semi": false,
-    "singleQuote": true,
+    "semi": true,
+    "singleQuote": false,
     "printWidth": 120
   },
   "dependencies": {

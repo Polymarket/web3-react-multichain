@@ -1,60 +1,58 @@
-import React, { createContext, useContext } from 'react'
-import invariant from 'tiny-invariant'
+import React, { createContext, useContext } from "react";
+import invariant from "tiny-invariant";
 
-import { Web3ReactContextInterface } from './types'
-import { useWeb3ReactManager } from './manager'
+import { Web3ReactContextInterface } from "./types";
+import { useWeb3ReactManager } from "./manager";
 
 const Web3ReactContext = createContext<Web3ReactContextInterface>({
-    activate: async () => {
-        invariant(false, "No <Web3ReactProvider ... /> found.");
-    },
-    setError: () => {
-        invariant(false, "No <Web3ReactProvider ... /> found.");
-    },
-    deactivate: async () => {
-        invariant(false, "No <Web3ReactProvider ... /> found.");
-    },
-    getProvider: async () => {
-        invariant(false, "No <Web3ReactProvider ... /> found.");
-    },
-    active: false,
+  activate: async () => {
+    invariant(false, "No <Web3ReactProvider ... /> found.");
+  },
+  setError: () => {
+    invariant(false, "No <Web3ReactProvider ... /> found.");
+  },
+  deactivate: async () => {
+    invariant(false, "No <Web3ReactProvider ... /> found.");
+  },
+  getProvider: async () => {
+    invariant(false, "No <Web3ReactProvider ... /> found.");
+  },
+  active: false
 });
 
-const { Provider } = Web3ReactContext;
-
 export const Web3ReactProvider: React.FC = ({ children }) => {
-    const {
-        connector,
-        account,
+  const {
+    connector,
+    account,
 
-        activate,
-        setError,
-        deactivate,
-        getProvider,
+    activate,
+    setError,
+    deactivate,
+    getProvider,
 
-        error,
-    } = useWeb3ReactManager();
+    error
+  } = useWeb3ReactManager();
 
-    const active = connector !== undefined && account !== undefined && !error;
+  const active = connector !== undefined && account !== undefined && !error;
 
-    const web3ReactContext: Web3ReactContextInterface = {
-        connector,
+  const web3ReactContext: Web3ReactContextInterface = {
+    connector,
 
-        account,
+    account,
 
-        getProvider,
+    getProvider,
 
-        activate,
-        setError,
-        deactivate,
+    activate,
+    setError,
+    deactivate,
 
-        active,
-        error,
-    };
+    active,
+    error
+  };
 
-    return <Provider value={web3ReactContext}>{children}</Provider>;
+  return <Web3ReactContext.Provider value={web3ReactContext}>{children}</Web3ReactContext.Provider>;
 };
 
 export function useWeb3React(): Web3ReactContextInterface {
-    return useContext(Web3ReactContext);
+  return useContext(Web3ReactContext);
 }

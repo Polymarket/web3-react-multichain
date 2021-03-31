@@ -31,7 +31,8 @@
   "scripts": {
     "start": "tsdx watch",
     "build": "tsdx build",
-    "lint": "tsdx lint src"
+    "lint": "tsdx lint src",
+    "lint:fix": "yarn lint --fix"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {

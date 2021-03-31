@@ -31,9 +31,11 @@
   "scripts": {
     "start": "tsdx watch",
     "build": "tsdx build",
-    "lint": "tsdx lint src"
+    "lint": "tsdx lint src",
+    "lint:fix": "yarn lint --fix"
   },
   "dependencies": {
+    "@ethersproject/providers": "^5.1.0",
     "@web3-react-multichain/types": "^6.0.7"
   },
   "license": "GPL-3.0-or-later",
