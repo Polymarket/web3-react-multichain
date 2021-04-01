@@ -1,5 +1,5 @@
 module.exports = {
-  extends: "airbnb-base-typescript-prettier",
+  extends: "airbnb-typescript-prettier",
   parserOptions: {
     project: "./tsconfig.json",
   },
@@ -30,6 +30,9 @@ module.exports = {
     "no-use-before-define": "off",
     "@typescript-eslint/no-use-before-define": ["error"],
     "no-shadow": "off",
-    "no-bitwise": "off"
+    "no-bitwise": "off",
   },
+  globals: {
+    JSX: true
+  }
 };
