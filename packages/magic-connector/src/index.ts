@@ -19,7 +19,7 @@ interface MagicConnectorArguments {
   apiKey: string;
   networks: Network[];
   email: string;
-  endpoint: string;
+  endpoint?: string;
 }
 
 export class UserRejectedRequestError extends Error {
@@ -57,26 +57,30 @@ export class MagicLinkExpiredError extends Error {
 export class MagicConnector extends AbstractConnector {
   private readonly apiKey: string;
 
-  private readonly email: string;
+  private email: string;
 
   private readonly networks: Network[];
 
-  private readonly endpoint: string;
+  private readonly endpoint: string | undefined;
 
   public magicInstances: Record<number, any>; // eslint-disable-line
 
-  constructor({ apiKey, email, networks, endpoint }: MagicConnectorArguments) {
+  constructor({ apiKey, networks, endpoint }: MagicConnectorArguments) {
     networks.map(({ chainId }) =>
       invariant(Object.keys(chainIdToNetwork).includes(chainId.toString()), `Unsupported chainId ${chainId}`)
     );
-    invariant(email && email.includes("@"), `Invalid email: ${email}`);
     super({ supportedChainIds: networks.map(({ chainId }) => chainId) });
 
     this.networks = networks;
     this.endpoint = endpoint;
     this.apiKey = apiKey;
-    this.email = email;
     this.magicInstances = {};
+    this.email = "";
+  }
+
+  public setEmail(email: string) {
+    invariant(email && email.includes("@"), `Invalid email: ${email}`);
+    this.email = email;
   }
 
   public getInitialInstance(): any { // eslint-disable-line
@@ -86,16 +90,15 @@ export class MagicConnector extends AbstractConnector {
   }
 
   public async activate(): Promise<ConnectorUpdate> {
+    invariant(this.email, "Cannot activate magic before setting email");
     const MagicSDK = await import("magic-sdk").then(m => m?.default ?? m);
     const { Magic, RPCError, RPCErrorCode } = MagicSDK;
 
     this.networks.forEach(network => {
       const instance = this.magicInstances[network.chainId];
       if (!instance) {
-        this.magicInstances[network.chainId] = new Magic(this.apiKey, {
-          network,
-          endpoint: this.endpoint
-        });
+        const params = this.endpoint ? { network, endpoint: this.endpoint } : { network };
+        this.magicInstances[network.chainId] = new Magic(this.apiKey, params);
       }
     });
 
