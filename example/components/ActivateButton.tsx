@@ -12,7 +12,8 @@ function ActivateButton({ activating, connected, disabled, name, onClick }): JSX
         borderRadius: '1rem',
         borderColor: activating ? 'orange' : connected ? 'green' : 'unset',
         cursor: disabled ? 'unset' : 'pointer',
-        position: 'relative'
+        position: 'relative',
+        width: '10em'
       }}
       disabled={disabled}
       key={name}

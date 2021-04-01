@@ -13,7 +13,8 @@ import { Web3Provider } from '@ethersproject/providers'
 
 // import { useEagerConnect, useInactiveListener } from '../hooks'
 import {
-  magic /* ,
+  magic,
+  networks /* ,
   portis,
   torus
   injected,
@@ -32,7 +33,7 @@ import Balance from '../components/Balance'
 import Account from '../components/Account'
 import ActivateButton from '../components/ActivateButton'
 import BlockNumber from '../components/BlockNumber'
-import ChainId from '../components/ChainId'
+import Transfer from '../components/Transfer'
 
 enum ConnectorNames {
   /*
@@ -114,7 +115,6 @@ function Header(): JSX.Element {
           margin: 'auto'
         }}
       >
-        <ChainId />
         <BlockNumber />
         <Account />
         <Balance />
@@ -157,7 +157,7 @@ function App(): JSX.Element {
   )
 
   return (
-    <>
+    <div style={{ margin: '0 10em 10em 10em' }}>
       <Header />
       <hr style={{ margin: '2rem' }} />
       <div
@@ -379,7 +379,10 @@ function App(): JSX.Element {
         )}
         */}
       </div>
-    </>
+      {networks.map(network => (
+        <Transfer chainId={network.chainId} key={network.chainId} />
+      ))}
+    </div>
   )
 }
 

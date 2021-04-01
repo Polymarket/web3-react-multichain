@@ -6,6 +6,8 @@
     "lint:fix": "eslint . --ext=.ts,.tsx --fix"
   },
   "dependencies": {
+    "@ethersproject/address": "^5.1.0",
+    "@ethersproject/bignumber": "^5.1.0",
     "@ethersproject/providers": "^5.0.2",
     "@ethersproject/units": "^5.0.1",
     "@web3-react-multichain/core": "^0.0.3",
