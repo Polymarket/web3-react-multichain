@@ -223,7 +223,7 @@ export function useWeb3ReactManager(): Web3ReactManagerReturn {
           const account = typeof update.account === "string" ? normalizeAccount(update.account) : update.account;
           dispatch({
             type: ActionType.UPDATE,
-            payload: { chainId, account }
+            payload: { account }
           });
         }
       } else {
