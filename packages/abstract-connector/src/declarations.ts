@@ -1,1 +1,1 @@
-declare const __DEV__: boolean  // eslint-disable-line
+declare const __DEV__: boolean;

@@ -17,6 +17,7 @@ module.exports = {
       "ignorePackages",
       {
         ts: "never",
+        tsx: "never",
       },
     ],
     "import/prefer-default-export": "off",
@@ -31,8 +32,6 @@ module.exports = {
     "@typescript-eslint/no-use-before-define": ["error"],
     "no-shadow": "off",
     "no-bitwise": "off",
-  },
-  globals: {
-    JSX: true
+    "no-underscore-dangle": "off",
   }
 };

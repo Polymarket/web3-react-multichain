@@ -17,5 +17,8 @@ module.exports = {
     "@typescript-eslint/no-explicit-any": "off",
     "react/jsx-props-no-spreading": "off",
     "no-alert": "off"
+  },
+  globals: {
+    JSX: true
   }
 }
