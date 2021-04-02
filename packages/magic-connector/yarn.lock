@@ -1660,6 +1660,19 @@
     semver "^7.3.2"
     tsutils "^3.17.1"
 
+"@web3-react-multichain/abstract-connector@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@web3-react-multichain/abstract-connector/-/abstract-connector-0.0.3.tgz#ddb47e4963b34fce0ddd480281c2dd07558e9a34"
+  integrity sha512-FuBuQr21FK0Dgpq3svVnokWeSCEOmr948dO+2wTqS0h7mgKf/YPRvVGD49XH5GvdRU5jZCR/fnk+OQ6CM+w+rQ==
+  dependencies:
+    "@ethersproject/providers" "^5.1.0"
+    "@web3-react-multichain/types" "^0.0.3"
+
+"@web3-react-multichain/types@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@web3-react-multichain/types/-/types-0.0.3.tgz#2b5791d138403ff9501d7dd30e347eeecdeafd41"
+  integrity sha512-1+W+Q+mI8VdYt1Rs2uetvyHur1S0P1P58pBmqsbwaAvILDS11pUq0a/5/abLp2ZFEJps8/ubggTvOQP7peX/XQ==
+
 abab@^2.0.0:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/abab/-/abab-2.0.5.tgz#c0b678fb32d60fc1219c784d6a826fe385aeb79a"
