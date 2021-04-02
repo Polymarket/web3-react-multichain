@@ -18,6 +18,8 @@ export abstract class AbstractConnector extends EventEmitter {
 
   public abstract async deactivate(): Promise<void>;
 
+  public abstract async getChainId(): Promise<number | string>;
+
   protected emitUpdate(update: ConnectorUpdate): void {
     if (__DEV__) {  // eslint-disable-line
       console.log(`Emitting '${ConnectorEvent.Update}' with payload`, update);

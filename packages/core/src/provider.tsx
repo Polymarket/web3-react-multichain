@@ -29,6 +29,8 @@ export const Web3ReactProvider: React.FC = ({ children }) => {
     setError,
     deactivate,
     getProvider,
+    currentProvider,
+    currentChainId,
 
     error
   } = useWeb3ReactManager();
@@ -39,6 +41,8 @@ export const Web3ReactProvider: React.FC = ({ children }) => {
     connector,
 
     account,
+    currentProvider,
+    currentChainId,
 
     getProvider,
 

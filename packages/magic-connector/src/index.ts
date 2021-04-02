@@ -65,12 +65,15 @@ export class MagicConnector extends AbstractConnector {
 
   public magicInstances: Record<number, any>; // eslint-disable-line
 
+  public activeChainId: number;
+
   constructor({ apiKey, networks, endpoint }: MagicConnectorArguments) {
     networks.map(({ chainId }) =>
       invariant(Object.keys(chainIdToNetwork).includes(chainId.toString()), `Unsupported chainId ${chainId}`)
     );
     super({ supportedChainIds: networks.map(({ chainId }) => chainId) });
 
+    this.activeChainId = networks[0].chainId;
     this.networks = networks;
     this.endpoint = endpoint;
     this.apiKey = apiKey;
@@ -111,10 +114,9 @@ export class MagicConnector extends AbstractConnector {
       await magic.user.logout();
     }
 
-    let authToken;
     if (!isLoggedIn) {
       try {
-        authToken = await magic.auth.loginWithMagicLink({ email: this.email, showUI: false });
+        await magic.auth.loginWithMagicLink({ email: this.email, showUI: false });
       } catch (err) {
         if (!(err instanceof RPCError)) {
           throw err;
@@ -137,8 +139,10 @@ export class MagicConnector extends AbstractConnector {
     }
 
     const account = await magic.rpcProvider.enable().then((accounts: string[]): string => accounts[0]);
+    const chainId = this.networks[0].chainId;
+    const provider = await this.getProvider(chainId);
 
-    return { account, authToken: authToken || "" };
+    return { account, chainId, provider };
   }
 
   public async getProvider(chainId: number): Promise<Web3Provider> {
@@ -147,6 +151,8 @@ export class MagicConnector extends AbstractConnector {
     const instance = this.magicInstances[chainId];
     invariant(!!instance, "Unable to get provider before calling `activate`");
 
+    this.activeChainId = chainId;
+
     return new Web3Provider(instance.rpcProvider as any); // eslint-disable-line
   }
 
@@ -154,6 +160,10 @@ export class MagicConnector extends AbstractConnector {
     const accounts = await this.getInitialInstance().send("eth_accounts");
 
     return accounts[0];
+  }
+
+  public async getChainId(): Promise<number | string> {
+    return this.activeChainId;
   }
 
   public async deactivate() {

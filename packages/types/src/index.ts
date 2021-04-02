@@ -1,3 +1,5 @@
+import { Web3Provider } from "@ethersproject/providers";
+
 export interface AbstractConnectorArguments {
   supportedChainIds?: number[];
 }
@@ -5,7 +7,7 @@ export interface AbstractConnectorArguments {
 export interface ConnectorUpdate<T = number | string> {
   chainId?: T;
   account?: null | string;
-  authToken?: string | undefined;
+  provider?: Web3Provider;
 }
 
 export enum ConnectorEvent {

@@ -38,5 +38,8 @@
   "devDependencies": {
     "tsdx": "^0.14.1"
   },
-  "gitHead": "8ae0da7958496df854fae31038c43c539fd1987b"
+  "gitHead": "8ae0da7958496df854fae31038c43c539fd1987b",
+  "dependencies": {
+    "@ethersproject/providers": "^5.1.0"
+  }
 }
