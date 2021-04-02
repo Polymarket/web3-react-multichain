@@ -29,7 +29,6 @@ import {
   fortmatic,
   */
 } from '../connectors'
-import Balance from '../components/Balance'
 import Account from '../components/Account'
 import ActivateButton from '../components/ActivateButton'
 import BlockNumber from '../components/BlockNumber'
@@ -117,7 +116,6 @@ function Header(): JSX.Element {
       >
         <BlockNumber />
         <Account />
-        <Balance />
       </h3>
     </>
   )
@@ -125,7 +123,7 @@ function Header(): JSX.Element {
 
 function App(): JSX.Element {
   const context = useWeb3React()
-  const { connector, library, account, activate, deactivate, active, error } = context
+  const { connector, getProvider, account, activate, deactivate, active, error } = context
 
   // handle logic to recognize the connector currently being activated
   const [activatingConnector, setActivatingConnector] = React.useState<any>()
@@ -238,7 +236,7 @@ function App(): JSX.Element {
           margin: 'auto'
         }}
       >
-        {!!(library && account) && (
+        {!!(getProvider && account) && (
           <button
             style={{
               height: '3rem',
@@ -246,138 +244,22 @@ function App(): JSX.Element {
               cursor: 'pointer'
             }}
             onClick={() => {
-              library
-                .getSigner(account)
-                .signMessage('👋')
-                .then((signature: any) => {
-                  window.alert(`Success!\n\n${signature}`)
-                })
-                .catch((error: any) => {
-                  window.alert('Failure!' + (error && error.message ? `\n\n${error.message}` : ''))
-                })
+              getProvider(5).then(provider => {
+                provider
+                  .getSigner(account)
+                  .signMessage('👋')
+                  .then((signature: any) => {
+                    window.alert(`Success!\n\n${signature}`)
+                  })
+                  .catch((error: any) => {
+                    window.alert('Failure!' + (error && error.message ? `\n\n${error.message}` : ''))
+                  })
+              })
             }}
           >
             Sign Message
           </button>
         )}
-        {/*
-        {!!(connector === connectorsByName[ConnectorNames.Network] && chainId) && (
-          <button
-            style={{
-              height: '3rem',
-              borderRadius: '1rem',
-              cursor: 'pointer'
-            }}
-            onClick={() => {
-              ;(connector as any).changeChainId(chainId === 1 ? 4 : 1)
-            }}
-          >
-            Switch Networks
-          </button>
-        )}
-        {connector === connectorsByName[ConnectorNames.WalletConnect] && (
-          <button
-            style={{
-              height: '3rem',
-              borderRadius: '1rem',
-              cursor: 'pointer'
-            }}
-            onClick={() => {
-              ;(connector as any).close()
-            }}
-          >
-            Kill WalletConnect Session
-          </button>
-        )}
-        {connector === connectorsByName[ConnectorNames.WalletLink] && (
-          <button
-            style={{
-              height: '3rem',
-              borderRadius: '1rem',
-              cursor: 'pointer'
-            }}
-            onClick={() => {
-              ;(connector as any).close()
-            }}
-          >
-            Kill WalletLink Session
-          </button>
-        )}
-        {connector === connectorsByName[ConnectorNames.Fortmatic] && (
-          <button
-            style={{
-              height: '3rem',
-              borderRadius: '1rem',
-              cursor: 'pointer'
-            }}
-            onClick={() => {
-              ;(connector as any).close()
-            }}
-          >
-            Kill Fortmatic Session
-          </button>
-        )}
-        */}
-        {connector === connectorsByName[ConnectorNames.Magic] && (
-          <button
-            style={{
-              height: '3rem',
-              borderRadius: '1rem',
-              cursor: 'pointer'
-            }}
-            onClick={() => {
-              ;(connector as any).close()
-            }}
-          >
-            Kill Magic Session
-          </button>
-        )}
-        {/*
-        {connector === connectorsByName[ConnectorNames.Portis] && (
-          <>
-            {chainId !== undefined && (
-              <button
-                style={{
-                  height: '3rem',
-                  borderRadius: '1rem',
-                  cursor: 'pointer'
-                }}
-                onClick={() => {
-                  ;(connector as any).changeNetwork(chainId === 1 ? 100 : 1)
-                }}
-              >
-                Switch Networks
-              </button>
-            )}
-            <button
-              style={{
-                height: '3rem',
-                borderRadius: '1rem',
-                cursor: 'pointer'
-              }}
-              onClick={() => {
-                ;(connector as any).close()
-              }}
-            >
-              Kill Portis Session
-            </button>
-          </>
-        )}
-        {connector === connectorsByName[ConnectorNames.Torus] && (
-          <button
-            style={{
-              height: '3rem',
-              borderRadius: '1rem',
-              cursor: 'pointer'
-            }}
-            onClick={() => {
-              ;(connector as any).close()
-            }}
-          >
-            Kill Torus Session
-          </button>
-        )}
-        */}
       </div>
       {networks.map(network => (
         <Transfer chainId={network.chainId} key={network.chainId} />

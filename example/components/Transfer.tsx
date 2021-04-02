@@ -4,12 +4,16 @@ import { parseUnits } from '@ethersproject/units'
 import { BigNumber } from '@ethersproject/bignumber'
 import { isAddress } from '@ethersproject/address'
 
+import Balance from './Balance'
+import { Spinner } from './Spinner'
+
 const DECIMALS = 18
 
 const Transfer = ({ chainId }): JSX.Element => {
   const { getProvider } = useWeb3React()
 
   const [recipient, setRecipient] = React.useState<string>('')
+  const [loading, setLoading] = React.useState<boolean>(false)
   const [amount, setAmount] = React.useState<string>('')
   const sendAmount: BigNumber = parseUnits(amount || '0', DECIMALS)
 
@@ -36,6 +40,8 @@ const Transfer = ({ chainId }): JSX.Element => {
       return
     }
 
+    setLoading(true)
+
     const provider = await getProvider(chainId)
     const signer = provider.getSigner()
 
@@ -44,18 +50,22 @@ const Transfer = ({ chainId }): JSX.Element => {
       value: sendAmount
     })
 
-    alert(receipt)
+    setLoading(false)
+
+    alert('Success! ', receipt.hash)
   }
 
   return (
-    <form style={{ display: 'flex', flexDirection: 'column' }} type="submit">
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
       <h1>Transfer on network {chainId}</h1>
+      <Balance chainId={chainId} />
       <input value={recipient} onChange={e => setRecipient(e.target.value)} placeholder="recipient" />
       <input value={amount} onChange={e => onChangeAmount(e.target.value)} placeholder="amount" />
-      <button style={{ width: '100%', height: '2em' }} type="submit" onClick={submitTransfer} label="submitTransfer">
+      <button style={{ width: '100%', height: '2em' }} onClick={submitTransfer} label="submitTransfer">
+        {loading && <Spinner color="black" style={{ height: '25%', marginLeft: '-1rem' }} />}
         Submit
       </button>
-    </form>
+    </div>
   )
 }
 

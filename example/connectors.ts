@@ -1,20 +1,35 @@
 import { MagicConnector } from '@web3-react-multichain/magic-connector'
 
-export const networks = [
+const mainnets = [
   {
-    rpcUrl: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
+    rpcUrl: `https://mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`,
     chainId: 1,
     explorerUrl: 'https://etherscan.io'
   },
   {
-    rpcUrl: `https://rpc-mainnet.maticvigil.com/v1/${process.env.MATIC_VIGIL_API_KEY}`,
+    rpcUrl: `https://rpc-mainnet.maticvigil.com/v1/${process.env.NEXT_PUBLIC_MATIC_VIGIL_API_KEY}`,
     chainId: 137,
     explorerUrl: 'https://explorer-mainnet.maticvigil.com'
   }
 ]
 
+const testnets = [
+  {
+    rpcUrl: `https://goerli.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`,
+    chainId: 5,
+    explorerUrl: 'https://goerli.etherscan.io'
+  },
+  {
+    rpcUrl: `https://rpc-mumbai.maticvigil.com/v1/${process.env.NEXT_PUBLIC_MATIC_VIGIL_API_KEY}`,
+    chainId: 80001,
+    explorerUrl: 'https://explorer-mumbai.maticvigil.com'
+  }
+]
+
+export const networks = process.env.NEXT_PUBLIC_NETWORK === 'mainnet' ? mainnets : testnets
+
 export const magic = new MagicConnector({
-  apiKey: process.env.MAGIC_API_KEY as string,
+  apiKey: process.env.NEXT_PUBLIC_MAGIC_API_KEY as string,
   networks
 })
 
