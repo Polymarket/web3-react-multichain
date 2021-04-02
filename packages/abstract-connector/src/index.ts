@@ -1,6 +1,5 @@
 import { EventEmitter } from "events";
 import { AbstractConnectorArguments, ConnectorUpdate, ConnectorEvent } from "@web3-react-multichain/types";
-import { Web3Provider } from "@ethersproject/providers";
 
 export abstract class AbstractConnector extends EventEmitter {
   public readonly supportedChainIds?: number[];
@@ -12,7 +11,7 @@ export abstract class AbstractConnector extends EventEmitter {
 
   public abstract async activate(): Promise<ConnectorUpdate>;
 
-  public abstract async getProvider(_chainId: number): Promise<Web3Provider>;
+  public abstract async getProvider(_chainId: number): Promise<any>; // eslint-disable-line
 
   public abstract async getAccount(): Promise<null | string>;
 

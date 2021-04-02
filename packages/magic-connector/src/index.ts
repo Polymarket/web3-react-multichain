@@ -1,7 +1,6 @@
 import { ConnectorUpdate, Network } from "@web3-react-multichain/types";
 import { AbstractConnector } from "@web3-react-multichain/abstract-connector";
 import invariant from "tiny-invariant";
-import { Web3Provider } from "@ethersproject/providers";
 
 type NetworkName = "mainnet" | "ropsten" | "rinkeby" | "kovan" | "goerli" | "matic" | "mumbai";
 
@@ -142,10 +141,10 @@ export class MagicConnector extends AbstractConnector {
     const chainId = this.networks[0].chainId;
     const provider = await this.getProvider(chainId);
 
-    return { account, chainId, provider };
+    return { account, chainId, provider: provider as any };
   }
 
-  public async getProvider(chainId: number): Promise<Web3Provider> {
+  public async getProvider(chainId: number): Promise<any> { // eslint-disable-line
     invariant(Object.keys(chainIdToNetwork).includes(chainId.toString()), `Unsupported chainId ${chainId}`);
 
     const instance = this.magicInstances[chainId];
@@ -153,7 +152,7 @@ export class MagicConnector extends AbstractConnector {
 
     this.activeChainId = chainId;
 
-    return new Web3Provider(instance.rpcProvider as any); // eslint-disable-line
+    return instance.rpcProvider;
   }
 
   public async getAccount(): Promise<null | string> {

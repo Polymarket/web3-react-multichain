@@ -35,7 +35,6 @@
     "lint:fix": "yarn lint --fix"
   },
   "dependencies": {
-    "@ethersproject/providers": "^5.1.0",
     "@web3-react-multichain/types": "^0.0.3"
   },
   "license": "GPL-3.0-or-later",

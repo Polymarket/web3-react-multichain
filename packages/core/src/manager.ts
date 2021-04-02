@@ -2,7 +2,6 @@ import { useReducer, useEffect, useCallback, useRef } from "react";
 import { ConnectorUpdate, ConnectorEvent } from "@web3-react-multichain/types";
 import { AbstractConnector } from "@web3-react-multichain/abstract-connector";
 import warning from "tiny-warning";
-import { Web3Provider } from "@ethersproject/providers";
 
 import { Web3ReactManagerReturn } from "./types";
 import { normalizeAccount, normalizeChainId } from "./normalizers";
@@ -30,7 +29,7 @@ interface Web3ReactManagerState {
 
   error?: Error;
 
-  currentProvider?: Web3Provider;
+  underlyingProvider?: any;
   currentChainId?: number;
 }
 
@@ -52,13 +51,13 @@ function reducer(state: Web3ReactManagerState, { type, payload }: Action): Web3R
   switch (type) {
     case ActionType.ACTIVATE_CONNECTOR: {
       const { connector, account, onError, provider, chainId } = payload;
-      return { connector, account, onError, currentProvider: provider, currentChainId: chainId };
+      return { connector, account, onError, underlyingProvider: provider, currentChainId: chainId };
     }
     case ActionType.UPDATE: {
       const { account, provider, chainId } = payload;
       return {
         ...state,
-        ...(provider === undefined ? {} : { currentProvider: provider }),
+        ...(provider === undefined ? {} : { underlyingProvider: provider }),
         ...(chainId === undefined ? {} : { currentChainId: chainId }),
         ...(account === undefined ? {} : { account })
       };
@@ -67,7 +66,7 @@ function reducer(state: Web3ReactManagerState, { type, payload }: Action): Web3R
       const { account, provider, chainId } = payload;
       return {
         ...state,
-        ...(provider === undefined ? {} : { currentProvider: provider }),
+        ...(provider === undefined ? {} : { underlyingProvider: provider }),
         ...(chainId === undefined ? {} : { currentChainId: chainId }),
         ...(account === undefined ? {} : { account }),
         error: undefined
@@ -119,21 +118,21 @@ async function augmentConnectorUpdate(
 
 export function useWeb3ReactManager(): Web3ReactManagerReturn {
   const [state, dispatch] = useReducer(reducer, {});
-  const { connector, account, onError, error, currentProvider, currentChainId } = state;
+  const { connector, account, onError, error, underlyingProvider, currentChainId } = state;
 
   const updateBusterRef = useRef(-1);
   updateBusterRef.current += 1;
 
-  const getProvider = useCallback(
-    async (_chainId: number): Promise<Web3Provider> => {
+  const getUnderlyingProvider = useCallback(
+    async (_chainId: number): Promise<any> => { // eslint-disable-line
       if (!connector) {
         throw new Error("Cannot call `getProvider` before calling `activate`");
       }
 
       const chainId = normalizeChainId(_chainId);
 
-      if (currentChainId === chainId && currentProvider) {
-        return currentProvider;
+      if (currentChainId === chainId && underlyingProvider) {
+        return underlyingProvider;
       }
 
       if (!!connector.supportedChainIds && !connector.supportedChainIds.includes(chainId)) {
@@ -150,7 +149,7 @@ export function useWeb3ReactManager(): Web3ReactManagerReturn {
 
       return provider;
     },
-    [connector, currentChainId, currentProvider]
+    [connector, currentChainId, underlyingProvider]
   );
 
   const activate = useCallback(
@@ -331,8 +330,8 @@ export function useWeb3ReactManager(): Web3ReactManagerReturn {
     setError,
     deactivate,
     error,
-    getProvider,
+    getUnderlyingProvider,
     currentChainId,
-    currentProvider
+    underlyingProvider
   };
 }

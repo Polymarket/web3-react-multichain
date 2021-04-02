@@ -1,5 +1,6 @@
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useCallback, useMemo } from "react";
 import invariant from "tiny-invariant";
+import { Web3Provider } from "@ethersproject/providers";
 
 import { Web3ReactContextInterface } from "./types";
 import { useWeb3ReactManager } from "./manager";
@@ -28,14 +29,26 @@ export const Web3ReactProvider: React.FC = ({ children }) => {
     activate,
     setError,
     deactivate,
-    getProvider,
-    currentProvider,
+    getUnderlyingProvider,
+    underlyingProvider,
     currentChainId,
 
     error
   } = useWeb3ReactManager();
 
   const active = connector !== undefined && account !== undefined && !error;
+
+  const getProvider = useCallback(async (chainId: number) => new Web3Provider(await getUnderlyingProvider(chainId)), [
+    getUnderlyingProvider
+  ]);
+
+  const currentProvider = useMemo(
+    () =>
+      active && currentChainId !== undefined && Number.isInteger(currentChainId) && !!connector
+        ? new Web3Provider(underlyingProvider)
+        : undefined,
+    [active, connector, currentChainId, underlyingProvider]
+  );
 
   const web3ReactContext: Web3ReactContextInterface = {
     connector,

@@ -1,23 +1,26 @@
 import { AbstractConnector } from "@web3-react-multichain/abstract-connector";
 import { Web3Provider } from "@ethersproject/providers";
 
-export interface Web3ReactManagerFunctions {
+type CommonFunctions = {
   activate: (connector: AbstractConnector, onError?: (error: Error) => void, throwErrors?: boolean) => Promise<void>;
   setError: (error: Error) => void;
   deactivate: () => Promise<void>;
-  getProvider: (chainId: number) => Promise<Web3Provider>;
-}
+};
+
+export type Web3ReactManagerFunctions = CommonFunctions & {
+  getUnderlyingProvider: (chainId: number) => Promise<any>;
+};
 
 export interface Web3ReactManagerReturn extends Web3ReactManagerFunctions {
   connector?: AbstractConnector;
   account?: null | string;
 
   error?: Error;
-  currentProvider?: Web3Provider;
+  underlyingProvider?: any;
   currentChainId?: number;
 }
 
-export interface Web3ReactContextInterface extends Web3ReactManagerFunctions {
+export type Web3ReactContextInterface = CommonFunctions & {
   connector?: AbstractConnector;
   account?: null | string;
 
@@ -26,4 +29,5 @@ export interface Web3ReactContextInterface extends Web3ReactManagerFunctions {
 
   currentProvider?: Web3Provider;
   currentChainId?: number;
-}
+  getProvider: (chainId: number) => Promise<Web3Provider>;
+};
