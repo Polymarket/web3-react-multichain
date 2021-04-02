@@ -1,0 +1,44 @@
+{
+  "name": "@web3-react-multichain/injected-connector",
+  "publishConfig": {
+    "access": "public"
+  },
+  "version": "0.0.1",
+  "description": "A simple, maximally extensible, dependency minimized framework for building modern Ethereum dApps",
+  "keywords": [
+    "react",
+    "react-hooks",
+    "hooks",
+    "ethereum",
+    "javascript",
+    "typescript",
+    "web3",
+    "context",
+    "frontend",
+    "dapp",
+    "metamask"
+  ],
+  "author": "Noah Zinsmeister <noahwz@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/NoahZinsmeister/web3-react.git"
+  },
+  "main": "dist/index.js",
+  "module": "dist/injected-connector.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "lint": "tsdx lint src"
+  },
+  "dependencies": {
+    "@web3-react-multichain/abstract-connector": "^0.0.3",
+    "@web3-react-multichain/types": "^0.0.3",
+    "tiny-invariant": "^1.1.0",
+    "tiny-warning": "^1.0.3"
+  },
+  "license": "GPL-3.0-or-later"
+}
