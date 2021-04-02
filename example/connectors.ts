@@ -2,27 +2,27 @@ import { MagicConnector } from '@web3-react-multichain/magic-connector'
 
 const mainnets = [
   {
-    rpcUrl: `https://mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`,
+    rpcUrl: [`https://mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`],
     chainId: 1,
-    explorerUrl: 'https://etherscan.io'
+    explorerUrl: ['https://etherscan.io']
   },
   {
-    rpcUrl: `https://rpc-mainnet.maticvigil.com/v1/${process.env.NEXT_PUBLIC_MATIC_VIGIL_API_KEY}`,
+    rpcUrl: [`https://rpc-mainnet.maticvigil.com/v1/${process.env.NEXT_PUBLIC_MATIC_VIGIL_API_KEY}`],
     chainId: 137,
-    explorerUrl: 'https://explorer-mainnet.maticvigil.com'
+    explorerUrl: ['https://explorer-mainnet.maticvigil.com']
   }
 ]
 
 const testnets = [
   {
-    rpcUrl: `https://goerli.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`,
+    rpcUrl: [`https://goerli.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`],
     chainId: 5,
-    explorerUrl: 'https://goerli.etherscan.io'
+    explorerUrl: ['https://goerli.etherscan.io']
   },
   {
-    rpcUrl: `https://rpc-mumbai.maticvigil.com/v1/${process.env.NEXT_PUBLIC_MATIC_VIGIL_API_KEY}`,
+    rpcUrl: [`https://rpc-mumbai.maticvigil.com/v1/${process.env.NEXT_PUBLIC_MATIC_VIGIL_API_KEY}`],
     chainId: 80001,
-    explorerUrl: 'https://explorer-mumbai.maticvigil.com'
+    explorerUrl: ['https://explorer-mumbai.maticvigil.com']
   }
 ]
 
