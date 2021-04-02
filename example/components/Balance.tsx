@@ -3,42 +3,30 @@ import { useWeb3React } from '@web3-react-multichain/core'
 import { formatEther } from '@ethersproject/units'
 
 function Balance({ chainId }): JSX.Element {
-  const { account, getProvider } = useWeb3React()
+  const { account, getProvider, active } = useWeb3React()
 
   const [balance, setBalance] = React.useState()
-  React.useEffect(() => {
-    if (account) {
-      let stale = false
-      ;(async () => {
-        const provider = await getProvider(chainId)
 
-        try {
-          const balance = await provider.getBalance(account)
-          if (!stale) {
-            setBalance(balance)
-          }
-        } catch (e) {
-          if (!stale) {
-            setBalance(null)
-          }
-        }
-      })()
+  const fetchBalance = React.useCallback(async () => {
+    const provider = await getProvider(chainId)
 
-      return (): void => {
-        stale = true
-        setBalance(undefined)
-      }
-    }
-  }, [account, getProvider, chainId]) // ensures refresh if referential identity of library doesn't change across chainIds
+    const balance = await provider.getBalance(account)
+    setBalance(balance)
+  }, [setBalance, getProvider, chainId, account])
 
   return (
-    <>
+    <div style={{ display: 'flex' }}>
       <span>Balance</span>
       <span role="img" aria-label="gold">
         💰
       </span>
       <span>{balance === null ? 'Error' : balance ? `Ξ${formatEther(balance)}` : ''}</span>
-    </>
+      {active && (
+        <button style={{ border: '1px solid black' }} onClick={fetchBalance}>
+          Refresh
+        </button>
+      )}
+    </div>
   )
 }
 

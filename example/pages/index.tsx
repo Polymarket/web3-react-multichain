@@ -33,6 +33,7 @@ import Account from '../components/Account'
 import ActivateButton from '../components/ActivateButton'
 import BlockNumber from '../components/BlockNumber'
 import Transfer from '../components/Transfer'
+import ChainId from '../components/ChainId'
 
 enum ConnectorNames {
   /*
@@ -115,15 +116,17 @@ function Header(): JSX.Element {
         }}
       >
         <BlockNumber />
+        <ChainId />
         <Account />
       </h3>
+      <p>ChainId will bounce around because it updates whenever `getProvider` is called with a different chainId.</p>
     </>
   )
 }
 
 function App(): JSX.Element {
   const context = useWeb3React()
-  const { connector, getProvider, account, activate, deactivate, active, error } = context
+  const { connector, getProvider, account, activate, deactivate, active, error, currentProvider } = context
 
   // handle logic to recognize the connector currently being activated
   const [activatingConnector, setActivatingConnector] = React.useState<any>()
@@ -244,17 +247,15 @@ function App(): JSX.Element {
               cursor: 'pointer'
             }}
             onClick={() => {
-              getProvider(5).then(provider => {
-                provider
-                  .getSigner(account)
-                  .signMessage('👋')
-                  .then((signature: any) => {
-                    window.alert(`Success!\n\n${signature}`)
-                  })
-                  .catch((error: any) => {
-                    window.alert('Failure!' + (error && error.message ? `\n\n${error.message}` : ''))
-                  })
-              })
+              currentProvider
+                .getSigner(account)
+                .signMessage('👋')
+                .then((signature: any) => {
+                  window.alert(`Success!\n\n${signature}`)
+                })
+                .catch((error: any) => {
+                  window.alert('Failure!' + (error && error.message ? `\n\n${error.message}` : ''))
+                })
             }}
           >
             Sign Message
