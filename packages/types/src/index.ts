@@ -15,7 +15,17 @@ export enum ConnectorEvent {
 }
 
 export interface Network {
-  rpcUrl: string;
+  rpcUrls: string[];
   chainId: number;
-  explorerUrl: string;
+  blockExplorerUrls: string[];
+}
+
+export interface NetworkWithInfo extends Network {
+  chainName: string;
+  nativeCurrency: {
+    name: string;
+    symbol: string; // 2-6 characters long
+    decimals: 18;
+  };
+  iconUrls?: string[]; // Currently ignored.
 }
