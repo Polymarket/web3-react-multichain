@@ -1,8 +1,9 @@
 import { ConnectorUpdate, NetworkWithInfo } from "@web3-react-multichain/types";
 import { AbstractConnector } from "@web3-react-multichain/abstract-connector";
 import warning from "tiny-warning";
+import { BigNumber } from "@ethersproject/bignumber";
 
-import { SendReturnResult, SendReturn, Send, SendOld } from "./types";
+import { SendReturnResult, SendReturn, Send, SendOld, Request } from "./types";
 import { normalizeChainId } from "./normalizers";
 
 interface Ethereum {
@@ -10,6 +11,7 @@ interface Ethereum {
   enable: () => Promise<string[]>;
   on?: (method: string, listener: (...args: any[]) => void) => void;
   removeListener?: (method: string, listener: (...args: any[]) => void) => void;
+  request: unknown;
 }
 
 declare global {
@@ -128,12 +130,42 @@ export class InjectedConnector extends AbstractConnector {
   }
 
   public async getProvider(chainId: number): Promise<any> {
-    const currentChainId = normalizeChainId(await this.getChainId());
+    if (!window.ethereum) {
+      throw new NoEthereumProviderError();
+    }
 
+    const currentChainId = normalizeChainId(await this.getChainId());
     if (currentChainId === chainId) {
       return window.ethereum;
     }
-    console.log(this.networks);
+
+    const network = this.networks.find(n => n.chainId === chainId);
+
+    if (!network) {
+      throw new Error(
+        `Network with chainId ${chainId} not found. Pass in the network to the constructor of InjectedConnector.`
+      );
+    }
+
+    const chainIdHex = BigNumber.from(network.chainId).toHexString();
+
+    try {
+      const res = await (window.ethereum.request as Request)({
+        method: "wallet_addEthereumChain",
+        params: [{ ...network, chainId: chainIdHex }]
+      });
+      console.log({ res });
+    } catch (e) {
+      console.log({ e });
+    }
+
+    /**
+     * Rejections to handle:
+     * If the RPC endpoint doesn't respond to RPC calls.
+     * If the RPC endpoint returns a different chain ID when eth_chainId is called.
+     * If the chain ID corresponds to any default MetaMask chains.
+     */
+
     return window.ethereum;
   }
 

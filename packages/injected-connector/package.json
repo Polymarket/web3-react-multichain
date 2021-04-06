@@ -35,6 +35,7 @@
     "lint": "tsdx lint src"
   },
   "dependencies": {
+    "@ethersproject/bignumber": "^5.1.0",
     "@web3-react-multichain/abstract-connector": "^0.0.3",
     "@web3-react-multichain/types": "^0.0.3",
     "tiny-invariant": "^1.1.0",
