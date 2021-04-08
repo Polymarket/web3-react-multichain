@@ -3,7 +3,7 @@ import { AbstractConnector } from "@web3-react-multichain/abstract-connector";
 import warning from "tiny-warning";
 import { BigNumber } from "@ethersproject/bignumber";
 
-import { SendReturnResult, SendReturn, Send, SendOld, Request } from "./types";
+import { SendReturnResult, SendReturn, SendOld, Request } from "./types";
 import { normalizeChainId } from "./normalizers";
 
 interface Ethereum {
@@ -27,7 +27,7 @@ interface InjectedConnectorArguments {
 }
 
 function parseSendReturn(sendReturn: SendReturnResult | SendReturn): any {
-  return sendReturn.hasOwnProperty("result") ? sendReturn.result : sendReturn;
+  return sendReturn.hasOwnProperty("result") ? sendReturn.result : sendReturn;  // eslint-disable-line
 }
 
 export class NoEthereumProviderError extends Error {
@@ -43,6 +43,14 @@ export class UserRejectedRequestError extends Error {
     super();
     this.name = this.constructor.name;
     this.message = "The user rejected the request.";
+  }
+}
+
+export class AddDefaultChainError extends Error {
+  public constructor() {
+    super();
+    this.name = this.constructor.name;
+    this.message = "MetaMask does not switching to a default Chain. Tell the user to manually switch instead.";
   }
 }
 
@@ -110,7 +118,7 @@ export class InjectedConnector extends AbstractConnector {
     // try to activate + get account via eth_requestAccounts
     let account;
     try {
-      account = await (window.ethereum.send as Send)("eth_requestAccounts").then(
+      account = await (window.ethereum.request as Request)({ method: "eth_requestAccounts" }).then(
         sendReturn => parseSendReturn(sendReturn)[0]
       );
     } catch (error) {
@@ -147,24 +155,31 @@ export class InjectedConnector extends AbstractConnector {
       );
     }
 
+    // MetaMask doesn't support calling `wallet_addEthereumChain` with a default chain
+    if ([1, 3, 4, 5, 42].includes(network.chainId)) {
+      throw new AddDefaultChainError();
+    }
+
     const chainIdHex = BigNumber.from(network.chainId).toHexString();
 
     try {
-      const res = await (window.ethereum.request as Request)({
+      await (window.ethereum.request as Request)({
         method: "wallet_addEthereumChain",
         params: [{ ...network, chainId: chainIdHex }]
       });
-      console.log({ res });
     } catch (e) {
-      console.log({ e });
+      if (/Chain ID returned by RPC URL/.test((e as any).message)) {
+        throw new Error(
+          "RPC endpoint returns a different chain ID when eth_chainId is called. Please check your network configs."
+        );
+      } else if (/Request for method/.test((e as any).message)) {
+        throw new Error(
+          "Request for method `eth_chainId failed`. Please check your rpcUrls field in your network configs."
+        );
+      } else if ((e as any).code === 4001) {
+        throw new UserRejectedRequestError();
+      }
     }
-
-    /**
-     * Rejections to handle:
-     * If the RPC endpoint doesn't respond to RPC calls.
-     * If the RPC endpoint returns a different chain ID when eth_chainId is called.
-     * If the chain ID corresponds to any default MetaMask chains.
-     */
 
     return window.ethereum;
   }
@@ -176,14 +191,14 @@ export class InjectedConnector extends AbstractConnector {
 
     let chainId;
     try {
-      chainId = await (window.ethereum.send as Send)("eth_chainId").then(parseSendReturn);
+      chainId = await (window.ethereum.request as Request)({ method: "eth_chainId" }).then(parseSendReturn);
     } catch {
       warning(false, "eth_chainId was unsuccessful, falling back to net_version");
     }
 
     if (!chainId) {
       try {
-        chainId = await (window.ethereum.send as Send)("net_version").then(parseSendReturn);
+        chainId = await (window.ethereum.request as Request)({ method: "net_version" }).then(parseSendReturn);
       } catch {
         warning(false, "net_version was unsuccessful, falling back to net version v2");
       }
@@ -219,7 +234,9 @@ export class InjectedConnector extends AbstractConnector {
 
     let account;
     try {
-      account = await (window.ethereum.send as Send)("eth_accounts").then(sendReturn => parseSendReturn(sendReturn)[0]);
+      account = await (window.ethereum.request as Request)({ method: "eth_accounts" }).then(
+        sendReturn => parseSendReturn(sendReturn)[0]
+      );
     } catch {
       warning(false, "eth_accounts was unsuccessful, falling back to enable");
     }
@@ -254,7 +271,7 @@ export class InjectedConnector extends AbstractConnector {
     }
 
     try {
-      return await (window.ethereum.send as Send)("eth_accounts").then(sendReturn => {
+      return await (window.ethereum.request as Request)({ method: "eth_accounts" }).then(sendReturn => {
         if (parseSendReturn(sendReturn).length > 0) {
           return true;
         }
