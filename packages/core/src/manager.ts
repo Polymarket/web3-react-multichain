@@ -140,7 +140,22 @@ export function useWeb3ReactManager(): Web3ReactManagerReturn {
         throw new Error(`Unsupported chain id: ${chainId}. Supported chain ids are: ${connector.supportedChainIds}.`);
       }
 
-      const provider = await connector.getProvider(chainId);
+      let provider;
+      try {
+        provider = await connector.getProvider(chainId);
+      } catch (error) {
+        if (onError) {
+          onError(error);
+          return undefined;
+        }
+
+        dispatch({
+          type: ActionType.ERROR,
+          payload: { error }
+        });
+
+        return undefined;
+      }
 
       dispatch({
         type: ActionType.UPDATE,
@@ -149,7 +164,7 @@ export function useWeb3ReactManager(): Web3ReactManagerReturn {
 
       return provider;
     },
-    [connector, currentChainId, underlyingProvider]
+    [connector, currentChainId, onError, underlyingProvider]
   );
 
   const activate = useCallback(

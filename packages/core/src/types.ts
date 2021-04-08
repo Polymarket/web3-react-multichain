@@ -29,5 +29,5 @@ export type Web3ReactContextInterface = CommonFunctions & {
 
   currentProvider?: Web3Provider;
   currentChainId?: number;
-  getProvider: (chainId: number) => Promise<Web3Provider>;
+  getProvider: (chainId: number) => Promise<Web3Provider | undefined>;
 };

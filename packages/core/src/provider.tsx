@@ -36,19 +36,33 @@ export const Web3ReactProvider: React.FC = ({ children }) => {
     error
   } = useWeb3ReactManager();
 
+  console.log({ underlyingProvider });
+
   const active = connector !== undefined && account !== undefined && !error;
 
-  const getProvider = useCallback(async (chainId: number) => new Web3Provider(await getUnderlyingProvider(chainId)), [
-    getUnderlyingProvider
-  ]);
-
-  const currentProvider = useMemo(
-    () =>
-      active && currentChainId !== undefined && Number.isInteger(currentChainId) && !!connector
-        ? new Web3Provider(underlyingProvider)
-        : undefined,
-    [active, connector, currentChainId, underlyingProvider]
+  const getProvider = useCallback(
+    async (chainId: number) => {
+      try {
+        return new Web3Provider(await getUnderlyingProvider(chainId));
+      } catch (e) {
+        console.log(e, "IN GET PROVIDER");
+        return undefined;
+      }
+    },
+    [getUnderlyingProvider]
   );
+
+  const currentProvider = useMemo(() => {
+    try {
+      console.log({ active, currentChainId, connector });
+      return active && currentChainId !== undefined && Number.isInteger(currentChainId) && !!connector
+        ? new Web3Provider(underlyingProvider)
+        : undefined;
+    } catch (e) {
+      console.log(e, "CURRENT PROVIVDER MEMO");
+      return undefined;
+    }
+  }, [active, connector, currentChainId, underlyingProvider]);
 
   const web3ReactContext: Web3ReactContextInterface = {
     connector,
