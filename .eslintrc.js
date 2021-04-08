@@ -33,5 +33,6 @@ module.exports = {
     "no-shadow": "off",
     "no-bitwise": "off",
     "no-underscore-dangle": "off",
+    "class-methods-use-this": "off"
   }
 };
