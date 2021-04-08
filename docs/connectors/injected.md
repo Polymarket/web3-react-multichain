@@ -1,36 +1,82 @@
-# `web3-react` Documentation - Injected
+# `web3-react-multichain` Documentation - Injected
 
 - [Install](#install)
 - [Arguments](#arguments)
 - [Example](#example)
 - [Errors](#errors)
+  - [AddDefaultChainError](#adddefaultchainerror)
   - [NoEthereumProviderError](#noethereumprovidererror)
     - [Example](#example-1)
   - [UserRejectedRequestError](#userrejectedrequesterror)
     - [Example](#example-2)
 
 ## Install
-`yarn add @web3-react/injected-connector`
+`yarn add @web3-react-multichain/injected-connector`
 
 ## Arguments
 ```typescript
-supportedChainIds?: number[]
+networks: NetworkWithInfo[];
+
+// which is defined below
+export interface Network {
+  rpcUrls: string[];
+  chainId: number;
+  blockExplorerUrls: string[];
+}
+
+export interface NetworkWithInfo extends Network {
+  chainName: string;
+  nativeCurrency: {
+    name: string;
+    symbol: string; // 2-6 characters long
+    decimals: 18;
+  };
+  iconUrls?: string[]; // Currently ignored.
+}
 ```
 
 ## Example
 ```javascript
-import { InjectedConnector } from '@web3-react/injected-connector'
+import { InjectedConnector } from '@web3-react-multichain/injected-connector'
 
-const injected = new InjectedConnector({ supportedChainIds: [1, 3, 4, 5, 42] })
+const networks = [
+  {
+    rpcUrls: [`https://mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`],
+    chainId: 1,
+    blockExplorerUrls: ['https://etherscan.io'],
+    chainName: 'Mainnet',
+    nativeCurrency: {
+      name: 'ETH',
+      symbol: 'ETH',
+      decimals: 18
+    }
+  },
+  {
+    rpcUrls: [`https://rpc-mainnet.maticvigil.com/v1/${process.env.NEXT_PUBLIC_MATIC_VIGIL_API_KEY}`],
+    chainId: 137,
+    blockExplorerUrls: ['https://explorer-mainnet.maticvigil.com'],
+    chainName: 'Matic',
+    nativeCurrency: {
+      name: 'Matic',
+      symbol: 'MATIC',
+      decimals: 18
+    }
+  }
+]
+
+const injected = new InjectedConnector({ networks })
 ```
 
 ## Errors
+
+### AddDefaultChainError
+MetaMask throws an error when you call `wallet_addEthereumChain` with one of it's default chains as a parameter. `@web3-react-multichain/injected-connector` is using that rpc method under the hood for `getProvider` so you'll need to prompt users to change their network to a default chain manually.
 
 ### NoEthereumProviderError
 
 #### Example
 ```javascript
-import { NoEthereumProviderError } from '@web3-react/injected-connector'
+import { NoEthereumProviderError } from '@web3-react-multichain/injected-connector'
 
 function Component () {
   const { error } = useWeb3React()
@@ -43,7 +89,7 @@ function Component () {
 
 #### Example
 ```javascript
-import { UserRejectedRequestError } from '@web3-react/injected-connector'
+import { UserRejectedRequestError } from '@web3-react-multichain/injected-connector'
 
 function Component () {
   const { error } = useWeb3React()

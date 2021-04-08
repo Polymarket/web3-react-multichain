@@ -12,8 +12,15 @@
 
 ```typescript
 apiKey: string
-chainId: number
-email: string
+networks: Network[]
+endpoint?: string
+
+// where Network is defined below
+export interface Network {
+  rpcUrls: string[];
+  chainId: number;
+  blockExplorerUrls: string[];
+}
 ```
 
 ## Example
@@ -21,7 +28,21 @@ email: string
 ```javascript
 import { MagicConnector } from '@web3-react/magic-connector'
 
-const magic = new MagicConnector({ apiKey: '…', chainId: 4, email: '…' })
+const networks = [
+  {
+    rpcUrls: [`https://mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`],
+    chainId: 1,
+    blockExplorerUrls: ['https://etherscan.io']
+  },
+  {
+    rpcUrls: [`https://rpc-mainnet.maticvigil.com/v1/${process.env.NEXT_PUBLIC_MATIC_VIGIL_API_KEY}`],
+    chainId: 137,
+    blockExplorerUrls: ['https://explorer-mainnet.maticvigil.com']
+  }
+]
+
+
+const magic = new MagicConnector({ apiKey: '…', networks })
 ```
 
 Note: Once the connector has been activated, the Magic SDK instance can be accessed under the `.magic` property.
