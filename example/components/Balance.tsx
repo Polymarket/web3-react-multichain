@@ -10,7 +10,7 @@ function Balance({ chainId }): JSX.Element {
   const fetchBalance = React.useCallback(async () => {
     const provider = await getProvider(chainId)
 
-    const balance = await provider.getBalance(account)
+    const balance = await provider?.getBalance(account)
     setBalance(balance)
   }, [setBalance, getProvider, chainId, account])
 

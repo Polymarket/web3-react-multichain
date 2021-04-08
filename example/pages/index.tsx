@@ -14,10 +14,10 @@ import { Web3Provider } from '@ethersproject/providers'
 // import { useEagerConnect, useInactiveListener } from '../hooks'
 import {
   magic,
-  networks /* ,
+  networks,
+  injected /* ,
   portis,
-  torus
-  injected,
+  torus,
   network,
   walletconnect,
   walletlink,
@@ -37,7 +37,6 @@ import ChainId from '../components/ChainId'
 
 enum ConnectorNames {
   /*
-  Injected = 'Injected',
   Network = 'Network',
   WalletConnect = 'WalletConnect',
   WalletLink = 'WalletLink',
@@ -50,12 +49,12 @@ enum ConnectorNames {
   Portis = 'Portis',
   Torus = 'Torus',
   */
+  Injected = 'Injected',
   Magic = 'Magic'
 }
 
 const connectorsByName: { [ConnectorNames]: any } = {
   /*
-  [ConnectorNames.Injected]: injected,
   [ConnectorNames.Network]: network,
   [ConnectorNames.WalletConnect]: walletconnect,
   [ConnectorNames.WalletLink]: walletlink,
@@ -68,6 +67,7 @@ const connectorsByName: { [ConnectorNames]: any } = {
   [ConnectorNames.Portis]: portis,
   [ConnectorNames.Torus]: torus,
   */
+  [ConnectorNames.Injected]: injected,
   [ConnectorNames.Magic]: magic
 }
 
@@ -195,6 +195,7 @@ function App(): JSX.Element {
 
           return (
             <ActivateButton
+              key={name}
               name={name}
               activating={activating}
               connected={connected}

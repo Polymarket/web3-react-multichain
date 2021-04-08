@@ -1,37 +1,64 @@
 import { MagicConnector } from '@web3-react-multichain/magic-connector'
+import { InjectedConnector } from '@web3-react-multichain/injected-connector'
 
 const mainnets = [
   {
-    rpcUrl: [`https://mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`],
+    rpcUrls: [`https://mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`],
     chainId: 1,
-    explorerUrl: ['https://etherscan.io']
+    blockExplorerUrls: ['https://etherscan.io'],
+    chainName: 'Mainnet',
+    nativeCurrency: {
+      name: 'ETH',
+      symbol: 'ETH',
+      decimals: 18
+    }
   },
   {
-    rpcUrl: [`https://rpc-mainnet.maticvigil.com/v1/${process.env.NEXT_PUBLIC_MATIC_VIGIL_API_KEY}`],
+    rpcUrls: [`https://rpc-mainnet.maticvigil.com/v1/${process.env.NEXT_PUBLIC_MATIC_VIGIL_API_KEY}`],
     chainId: 137,
-    explorerUrl: ['https://explorer-mainnet.maticvigil.com']
+    blockExplorerUrls: ['https://explorer-mainnet.maticvigil.com'],
+    chainName: 'Matic',
+    nativeCurrency: {
+      name: 'Matic',
+      symbol: 'MATIC',
+      decimals: 18
+    }
   }
 ]
 
 const testnets = [
   {
-    rpcUrl: [`https://goerli.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`],
+    rpcUrls: [`https://goerli.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`],
     chainId: 5,
-    explorerUrl: ['https://goerli.etherscan.io']
+    blockExplorerUrls: ['https://goerli.etherscan.io'],
+    chainName: 'Goerli',
+    nativeCurrency: {
+      name: 'ETH',
+      symbol: 'ETH',
+      decimals: 18
+    }
   },
   {
-    rpcUrl: [`https://rpc-mumbai.maticvigil.com/v1/${process.env.NEXT_PUBLIC_MATIC_VIGIL_API_KEY}`],
+    rpcUrls: [`https://rpc-mumbai.maticvigil.com/v1/${process.env.NEXT_PUBLIC_MATIC_VIGIL_API_KEY}`],
     chainId: 80001,
-    explorerUrl: ['https://explorer-mumbai.maticvigil.com']
+    blockExplorerUrls: ['https://explorer-mumbai.maticvigil.com'],
+    chainName: 'Mumbai',
+    nativeCurrency: {
+      name: 'Matic',
+      symbol: 'MATIC',
+      decimals: 18
+    }
   }
 ]
 
-export const networks = process.env.NEXT_PUBLIC_NETWORK === 'mainnet' ? mainnets : testnets
+export const networks = mainnets // process.env.NEXT_PUBLIC_NETWORK === 'mainnet' ? mainnets : testnets
 
 export const magic = new MagicConnector({
   apiKey: process.env.NEXT_PUBLIC_MAGIC_API_KEY as string,
   networks
 })
+
+export const injected = new InjectedConnector({ networks })
 
 /*
 const POLLING_INTERVAL = 12000
